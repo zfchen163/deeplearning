@@ -1,0 +1,61 @@
+project_name: ImageClassificationProject
+description: Production-grade image classification system
+version: 1.0.0
+seed: 42
+device: cuda
+
+# 数据配置
+data_config:
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  shuffle: true
+  augment: true
+
+# 模型配置
+model_config:
+  architecture: resnet50
+  pretrained: true
+  num_classes: 10
+  dropout_rate: 0.5
+  freeze_backbone: false
+  freeze_until_layer: 0
+
+# 训练配置
+training_config:
+  num_epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  optimizer: adamw
+  scheduler: cosine
+  warmup_epochs: 5
+  gradient_clip: 1.0
+  mixed_precision: true
+  accumulation_steps: 1
+
+# 正则化配置
+regularization_config:
+  use_dropout: true
+  dropout_rate: 0.5
+  use_batch_norm: true
+  use_weight_decay: true
+  weight_decay: 0.00001
+  use_label_smoothing: true
+  label_smoothing: 0.1
+
+# 早停配置
+early_stopping_config:
+  enabled: true
+  patience: 10
+  min_delta: 0.0001
+  monitor: val_loss
+
+# 路径配置
+project_root: ./projects
+data_dir: ./data
+checkpoints_dir: ./checkpoints
+logs_dir: ./logs
+results_dir: ./results

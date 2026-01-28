@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度学习在线学习平台</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🎓 深度学习学习平台</h1>
+                <p class="subtitle">适合高中生的AI入门课程</p>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="搜索课程...">
+                <button id="searchBtn">🔍 搜索</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区 -->
+    <div class="container main-content">
+        <!-- 左侧边栏:课程列表 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📚 课程目录</h2>
+                <button id="collapseAllBtn">折叠全部</button>
+            </div>
+            <div id="categoriesList" class="categories-list">
+                <div class="loading">加载中...</div>
+            </div>
+        </aside>
+
+        <!-- 右侧内容区:笔记本查看器 -->
+        <main class="content-area">
+            <!-- 欢迎页面 -->
+            <div id="welcomePage" class="welcome-page">
+                <div class="welcome-card">
+                    <h1>👋 欢迎来到深度学习学习平台!</h1>
+                    <p class="welcome-intro">
+                        这是一个专为<strong>高中生</strong>设计的深度学习入门课程平台。
+                        我们用<strong>生活中的例子</strong>和<strong>通俗易懂的语言</strong>,
+                        帮你理解AI背后的原理。
+                    </p>
+
+                    <div class="features">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎮</div>
+                            <h3>趣味学习</h3>
+                            <p>用游戏、印章、袋鼠跳等类比,让抽象概念变得具体</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">💻</div>
+                            <h3>动手实践</h3>
+                            <p>每个概念都配有可运行的代码示例</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3>循序渐进</h3>
+                            <p>从基础到进阶,157个课程系统学习</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🚀</div>
+                            <h3>实战项目</h3>
+                            <p>Kaggle竞赛、图像识别等真实项目</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-start">
+                        <h2>🎯 快速开始</h2>
+                        <ol>
+                            <li>从左侧选择<strong>"基础入门"</strong>分类</li>
+                            <li>点击<strong>"Pytorch安装"</strong>开始第一课</li>
+                            <li>按照课程顺序,一步步学习</li>
+                            <li>遇到问题?每节课都有详细的说明和练习</li>
+                        </ol>
+                    </div>
+
+                    <div class="tips">
+                        <h3>💡 学习建议</h3>
+                        <ul>
+                            <li><strong>不要着急</strong> - 每个概念都需要时间消化</li>
+                            <li><strong>多动手</strong> - 运行代码,修改参数,看看会发生什么</li>
+                            <li><strong>做笔记</strong> - 记录你的理解和疑问</li>
+                            <li><strong>坚持学习</strong> - 每天30分钟,3个月后你会惊讶于自己的进步</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 笔记本查看器 -->
+            <div id="notebookViewer" class="notebook-viewer" style="display: none;">
+                <div class="notebook-header">
+                    <button id="backBtn" class="back-btn">← 返回</button>
+                    <h2 id="notebookTitle">笔记本标题</h2>
+                    <span id="notebookCategory" class="category-badge">分类</span>
+                </div>
+                <div id="notebookContent" class="notebook-content">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 搜索结果 -->
+            <div id="searchResults" class="search-results" style="display: none;">
+                <div class="search-header">
+                    <button id="closeSearchBtn" class="back-btn">← 返回</button>
+                    <h2>搜索结果</h2>
+                </div>
+                <div id="searchResultsList"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 深度学习学习平台 | 让AI学习变得简单有趣</p>
+            <p>共 <span id="totalNotebooks">157</span> 个课程 | 使用 Go + JavaScript 构建</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
