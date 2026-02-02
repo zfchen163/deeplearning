@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深度学习在线学习平台</title>
+    <title>深度学习代码厨房 | 初中生也能学会的 AI</title>
+    <!-- 预加载字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- 样式表 -->
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <!-- 图标库 -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
     <!-- 顶部导航栏 -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <h1>🎓 深度学习学习平台</h1>
-                <p class="subtitle">适合高中生的AI入门课程</p>
+                <h1>🧑‍� AI 代码厨房</h1>
+                <p class="subtitle">专为初中生打造的深度学习实战营</p>
             </div>
             <div class="nav-search">
-                <input type="text" id="searchInput" placeholder="搜索课程...">
-                <button id="searchBtn">🔍 搜索</button>
+                <i class="ri-search-line" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="searchInput" placeholder="搜索食谱 (例如: 卷积, 线性回归)..." style="padding-left: 48px;">
+                <button id="searchBtn">搜索</button>
             </div>
         </div>
     </nav>
@@ -27,11 +36,11 @@
         <!-- 左侧边栏:课程列表 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>📚 课程目录</h2>
-                <button id="collapseAllBtn">折叠全部</button>
+                <h2><i class="ri-book-read-line"></i> 课程菜单</h2>
+                <button id="collapseAllBtn" title="折叠所有分类"><i class="ri-expand-height-line"></i> 折叠</button>
             </div>
             <div id="categoriesList" class="categories-list">
-                <div class="loading">加载中...</div>
+                <div class="loading"><i class="ri-loader-4-line"></i> 正在准备菜单...</div>
             </div>
         </aside>
 
@@ -40,54 +49,52 @@
             <!-- 欢迎页面 -->
             <div id="welcomePage" class="welcome-page">
                 <div class="welcome-card">
-                    <h1>👋 欢迎来到深度学习学习平台!</h1>
+                    <h1>👋 欢迎来到代码厨房!</h1>
                     <p class="welcome-intro">
-                        这是一个专为<strong>高中生</strong>设计的深度学习入门课程平台。
-                        我们用<strong>生活中的例子</strong>和<strong>通俗易懂的语言</strong>,
-                        帮你理解AI背后的原理。
+                        这里没有枯燥的数学公式，只有美味的<strong>代码大餐</strong>。
+                        我们将人工智能的原理拆解成一个个有趣的<strong>烹饪步骤</strong>。
+                        只要你会玩积木，就能学会搭建神经网络！
                     </p>
 
                     <div class="features">
                         <div class="feature-card">
                             <div class="feature-icon">🎮</div>
-                            <h3>趣味学习</h3>
-                            <p>用游戏、印章、袋鼠跳等类比,让抽象概念变得具体</p>
+                            <h3>像玩游戏一样学习</h3>
+                            <p>把 AI 训练看作是打怪升级。调整参数就是给角色换装备，看着准确率上涨就像看着等级提升！</p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-icon">💻</div>
-                            <h3>动手实践</h3>
-                            <p>每个概念都配有可运行的代码示例</p>
+                            <div class="feature-icon">🍳</div>
+                            <h3>亲自下厨实践</h3>
+                            <p>别光看着，动手改改代码！把“学习率”调大一点会发生什么？炸了？没关系，这是虚拟厨房！</p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-icon">📊</div>
-                            <h3>循序渐进</h3>
-                            <p>从基础到进阶,157个课程系统学习</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">🚀</div>
-                            <h3>实战项目</h3>
-                            <p>Kaggle竞赛、图像识别等真实项目</p>
+                            <div class="feature-icon">🧩</div>
+                            <h3>积木式编程</h3>
+                            <p>不需要从零造轮子。我们准备好了各种功能的“积木”（函数），你只需要把它们拼装起来。</p>
                         </div>
                     </div>
 
                     <div class="quick-start">
-                        <h2>🎯 快速开始</h2>
+                        <h2>🚀 厨师长推荐：新手套餐</h2>
                         <ol>
-                            <li>从左侧选择<strong>"基础入门"</strong>分类</li>
-                            <li>点击<strong>"Pytorch安装"</strong>开始第一课</li>
-                            <li>按照课程顺序,一步步学习</li>
-                            <li>遇到问题?每节课都有详细的说明和练习</li>
+                            <li>在左侧菜单找到 <strong>"基础入门"</strong>。</li>
+                            <li>点击 <strong>"101_Pytorch安装"</strong> (这是你的第一把菜刀)。</li>
+                            <li>接着试试 <strong>"102_Python两大法宝"</strong> (学会切菜和生火)。</li>
+                            <li>一步步来，很快你就能做出自己的第一个 AI 模型！</li>
                         </ol>
                     </div>
 
                     <div class="tips">
-                        <h3>💡 学习建议</h3>
+                        <h3>💡 厨房安全守则</h3>
                         <ul>
-                            <li><strong>不要着急</strong> - 每个概念都需要时间消化</li>
-                            <li><strong>多动手</strong> - 运行代码,修改参数,看看会发生什么</li>
-                            <li><strong>做笔记</strong> - 记录你的理解和疑问</li>
-                            <li><strong>坚持学习</strong> - 每天30分钟,3个月后你会惊讶于自己的进步</li>
+                            <li><strong>不要死记硬背</strong> - 理解原理比背代码更重要。</li>
+                            <li><strong>多问为什么</strong> - 为什么这里要用卷积？为什么那里要用池化？</li>
+                            <li><strong>保持好奇心</strong> - AI 是一个正在爆炸式发展的领域，每天都有新菜谱诞生！</li>
                         </ul>
+                    </div>
+                    
+                    <div style="margin-top: 48px; text-align: center; color: var(--text-light); font-size: 12px;">
+                        <p>Made with ❤️ for Future AI Engineers</p>
                     </div>
                 </div>
             </div>
@@ -95,36 +102,20 @@
             <!-- 笔记本查看器 -->
             <div id="notebookViewer" class="notebook-viewer" style="display: none;">
                 <div class="notebook-header">
-                    <button id="backBtn" class="back-btn">← 返回</button>
-                    <h2 id="notebookTitle">笔记本标题</h2>
+                    <button id="backBtn" class="back-btn"><i class="ri-arrow-left-line"></i> 返回首页</button>
+                    <h2 id="notebookTitle">课程标题</h2>
                     <span id="notebookCategory" class="category-badge">分类</span>
                 </div>
                 <div id="notebookContent" class="notebook-content">
-                    <div class="loading">加载中...</div>
+                    <!-- 内容将通过 JS 动态注入 -->
                 </div>
-            </div>
-
-            <!-- 搜索结果 -->
-            <div id="searchResults" class="search-results" style="display: none;">
-                <div class="search-header">
-                    <button id="closeSearchBtn" class="back-btn">← 返回</button>
-                    <h2>搜索结果</h2>
-                </div>
-                <div id="searchResultsList"></div>
             </div>
         </main>
     </div>
 
-    <!-- 底部 -->
-    <footer class="footer">
-        <div class="container">
-            <p>© 2026 深度学习学习平台 | 让AI学习变得简单有趣</p>
-            <p>共 <span id="totalNotebooks">157</span> 个课程 | 使用 Go + JavaScript 构建</p>
-        </div>
-    </footer>
-
+    <!-- 脚本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

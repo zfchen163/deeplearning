@@ -1,614 +1,846 @@
-#!/usr/bin/env python3
-"""
-V7版本: 深度优化 - 为每个函数添加实际应用讲解
-重点:
-1. 这个函数能解决什么实际问题
-2. 为什么要用这个函数(不用会怎样)
-3. 生活中的类比
-4. 循序渐进的知识展开
-5. 初中生都能看懂
-"""
+
 import json
 import os
 import re
 from pathlib import Path
 
-# 常见函数的实际应用讲解
-FUNCTION_EXPLANATIONS = {
-    "transforms.ToTensor": {
-        "what": "把图片变成PyTorch能理解的数字",
-        "why": """
-### 🤔 为什么要用 ToTensor?
+# Mapping of filename keywords to specific, vivid analogies
+CONCEPT_MAP = {
+    "227_深度学习硬件CPU和GPU": {
+        "title": "CPU vs GPU: 教授 vs 小学生班级",
+        "analogy_title": "🏫 谁来做算术题？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你需要计算 1000 道简单的加法题 (1+1, 2+3...)。
 
-**问题: 电脑不认识图片**
-- 你看到的图片是彩色的
-- 但电脑只认识数字(0和1)
-- 需要把图片转换成数字
+**选项 A: 请一位数学教授 (CPU)**
+- **优点**: 教授非常聪明，能解复杂的微积分。
+- **缺点**: 教授虽然厉害，但他一次只能算一道题。算完1000道题需要很长时间。
 
-**就像翻译:**
-- 图片 = 中文
-- Tensor = 英文
-- ToTensor = 翻译器
+**选项 B: 请 1000 个小学生 (GPU)**
+- **优点**: 小学生只会简单的加减法，但他们有1000个人！
+- **缺点**: 单个小学生不如教授聪明。
+- **结果**: 老师一声令下，1000个小学生同时动笔，**1秒钟**就做完了所有题目！
 
-**不用会怎样?**
-❌ 神经网络无法处理图片
-❌ 就像让不会中文的外国人读中文书
+**深度学习通过大量的简单运算（矩阵乘法），更适合让"一堆小学生"(GPU)来做，而不是"一个教授"(CPU)。**
 """,
-        "example": """
-### 📱 实际应用: 手机拍照识别
-
-**场景: 用手机扫描植物识别**
-
-1. 📸 你拍了一张花的照片
-2. 🔄 ToTensor把照片变成数字
-3. 🤖 AI读取这些数字
-4. 🌸 识别出是"玫瑰花"
-
-```python
-# 第1步: 导入工具
-from torchvision import transforms
-from PIL import Image
-
-# 第2步: 加载图片(假设你拍了一张花的照片)
-img = Image.open('flower.jpg')
-print(f"原始图片类型: {type(img)}")  # PIL图片
-
-# 第3步: 转换成Tensor
-to_tensor = transforms.ToTensor()
-tensor_img = to_tensor(img)
-
-print(f"转换后类型: {type(tensor_img)}")  # Tensor
-print(f"数字形状: {tensor_img.shape}")    # [3, 高, 宽]
-# 3 = RGB三个颜色通道(红绿蓝)
-
-# 第4步: 现在AI可以处理了！
-# tensor_img 就是一堆数字,AI能看懂
-```
-
-**理解:**
-- 原始图片: 人类能看懂
-- Tensor: 电脑能看懂
-- ToTensor: 翻译工具
-""",
-        "progressive": """
-### 📚 循序渐进理解
-
-**第1层: 小学生理解**
-- 把图片变成数字
-
-**第2层: 初中生理解**
-- 图片是由像素组成的
-- 每个像素有颜色(RGB)
-- ToTensor把每个像素的颜色变成0-1之间的数字
-
-**第3层: 高中生理解**
-- 原始图片: PIL Image对象,像素值0-255
-- ToTensor做了两件事:
-  1. 把像素值除以255,变成0-1
-  2. 改变维度顺序: (H,W,C) → (C,H,W)
-"""
+        "problem": "深度学习需要进行数亿次的简单计算，用CPU太慢了。",
+        "solution": "使用GPU，利用成千上万个核心同时计算（并行计算），速度提升几十倍！"
     },
-    
-    "nn.Conv2d": {
-        "what": "用小窗口扫描图片,找特征",
-        "why": """
-### 🤔 为什么要用 Conv2d?
+    "228_深度学习硬件TPU和其他": {
+        "title": "TPU: 专门包饺子的机器",
+        "analogy_title": "🥟 手工 vs 机器",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你要开一家饺子馆。
 
-**问题: 全连接层太笨了**
-- 全连接层把整张图片压扁成一条线
-- 丢失了空间信息(哪个像素在哪里)
-- 参数太多,计算太慢
+- **CPU (教授)**: 全能型人才，会包饺子，也会算账，还会炒菜。但包饺子速度一般。
+- **GPU (小学生班级)**: 人多力量大，大家一起包，速度很快。
+- **TPU (全自动饺子机)**: **它只会包饺子，别的啥都不会。**
+  - 但它包饺子的速度是 GPU 的 10 倍！
+  - 它就是为了"包饺子"（深度学习计算）这一件事而专门设计的。
 
-**就像:**
-- ❌ 全连接层 = 把拼图打散,看不出图案
-- ✅ 卷积层 = 用放大镜一块一块看,保留位置关系
-
-**不用会怎样?**
-❌ 识别图片效果差
-❌ 训练速度慢
-❌ 需要更多数据
+**TPU (Tensor Processing Unit)** 是谷歌专门为深度学习定制的"超级专用机"。
 """,
-        "example": """
-### 📱 实际应用: 人脸识别
-
-**场景: 手机解锁(Face ID)**
-
-```python
-import torch
-import torch.nn as nn
-
-# 假设这是你的脸部照片(简化版)
-face_image = torch.randn(1, 3, 224, 224)
-# 1 = 1张图片
-# 3 = RGB三个颜色
-# 224x224 = 图片大小
-
-# 第1步: 创建卷积层(找脸部特征)
-conv = nn.Conv2d(
-    in_channels=3,      # 输入RGB图片
-    out_channels=32,    # 找32种不同的特征
-    kernel_size=3,      # 用3x3的小窗口扫描
-    padding=1           # 保持图片大小不变
-)
-
-# 第2步: 扫描图片,找特征
-features = conv(face_image)
-print(f"找到的特征: {features.shape}")
-# 输出: [1, 32, 224, 224]
-# 32个特征图,每个都是224x224
-
-# 这32个特征可能包括:
-# - 眼睛的位置
-# - 鼻子的形状
-# - 嘴巴的轮廓
-# - 脸部的边缘
-# ...等等
-
-# 第3步: 后续层会用这些特征判断是不是你
-```
-
-**为什么有效?**
-1. 卷积核像"特征检测器"
-2. 每个卷积核专门找一种特征
-3. 32个卷积核 = 32个检测器
-4. 找到足够多的特征,就能认出你的脸
-""",
-        "progressive": """
-### 📚 循序渐进理解
-
-**第1层: 小学生理解**
-- 用小窗口在图片上滑动
-- 找图片里的特征
-
-**第2层: 初中生理解**
-- 小窗口 = 卷积核(kernel)
-- 滑动 = 从左到右,从上到下扫描
-- 找特征 = 计算相似度
-- 例子: 找边缘、找角点、找纹理
-
-**第3层: 高中生理解**
-- 卷积核是一个小矩阵(如3x3)
-- 每次滑动,卷积核和图片对应位置相乘再求和
-- 多个卷积核可以找多种特征
-- 参数共享: 同一个卷积核扫描整张图片
-
-**第4层: 参数详解**
-```python
-nn.Conv2d(
-    in_channels=3,    # 输入通道数(RGB=3)
-    out_channels=32,  # 输出通道数(找32种特征)
-    kernel_size=3,    # 卷积核大小(3x3)
-    stride=1,         # 步长(每次移动1格)
-    padding=1         # 填充(保持大小)
-)
-```
-"""
+        "problem": "即使是GPU，也不是专门为深度学习设计的，还有提升空间。",
+        "solution": "设计专门的硬件(ASIC)，去掉所有不必要的功能，只保留深度学习最需要的计算单元。"
     },
-    
-    "nn.ReLU": {
-        "what": "把负数变成0,正数不变",
-        "why": """
-### 🤔 为什么要用 ReLU?
+    "229_单机多卡并行": {
+        "title": "单机多卡: 一个厨房，四个大厨",
+        "analogy_title": "👨‍🍳 多人协作做大餐",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你要准备一场百人宴席（训练大模型）。
 
-**问题: 神经网络太"线性"了**
-- 没有激活函数,神经网络只能画直线
-- 现实世界很复杂,不是直线能解决的
+- **单卡训练**: 只有一个大厨，累死也做不完。
+- **多卡并行**: 厨房里请了4个大厨。
+  - **分工**: 每个人负责切一部分菜（数据并行）。
+  - **同步**: 大家做完后，主厨把菜汇总起来（梯度聚合）。
 
-**就像:**
-- ❌ 没有ReLU = 只能用直尺画图
-- ✅ 有ReLU = 可以画曲线、圆圈、各种形状
-
-**不用会怎样?**
-❌ 多层神经网络等于一层(退化)
-❌ 无法学习复杂模式
-❌ 准确率很低
+**关键点**: 他们在同一个厨房（单机），沟通很方便（通信速度快）。
 """,
-        "example": """
-### 📱 实际应用: 判断天气
-
-**场景: 根据温度、湿度、风速判断会不会下雨**
-
-```python
-import torch
-import torch.nn as nn
-
-# 假设我们有3个输入: 温度、湿度、风速
-# 温度=25度, 湿度=80%, 风速=5m/s
-weather_data = torch.tensor([[25.0, 80.0, 5.0]])
-
-# 第1步: 线性层(计算)
-linear = nn.Linear(3, 1)
-score = linear(weather_data)
-print(f"计算得分: {score.item():.2f}")  # 可能是负数
-
-# 第2步: ReLU激活(决策)
-relu = nn.ReLU()
-activated = relu(score)
-print(f"激活后: {activated.item():.2f}")
-
-# ReLU的作用:
-# - 如果得分 < 0: 变成0(不会下雨)
-# - 如果得分 > 0: 保持不变(可能下雨)
-
-# 为什么这样有用?
-# 1. 引入非线性(可以学习复杂规律)
-# 2. 过滤掉不重要的信号(负数变0)
-# 3. 计算速度快(比sigmoid等函数快)
-```
-
-**生活类比: 过滤器**
-- 想象一个筛子
-- 大于0的通过(保留)
-- 小于0的被挡住(变成0)
-- 就像只让"有用的信息"通过
-""",
-        "progressive": """
-### 📚 循序渐进理解
-
-**第1层: 小学生理解**
-- 正数不变
-- 负数变成0
-
-**第2层: 初中生理解**
-- ReLU = Rectified Linear Unit(修正线性单元)
-- 公式: f(x) = max(0, x)
-- 作用: 让神经网络能学习复杂模式
-
-**第3层: 高中生理解**
-- 为什么需要非线性?
-  * 线性函数: y = ax + b(直线)
-  * 多层线性 = 还是线性
-  * 加入ReLU = 可以拟合任意曲线
-
-**第4层: 对比其他激活函数**
-```python
-x = torch.tensor([-2, -1, 0, 1, 2])
-
-# ReLU: 负数变0
-relu = nn.ReLU()
-print(f"ReLU: {relu(x)}")  # [0, 0, 0, 1, 2]
-
-# Sigmoid: 压缩到0-1
-sigmoid = nn.Sigmoid()
-print(f"Sigmoid: {sigmoid(x)}")  # [0.12, 0.27, 0.5, 0.73, 0.88]
-
-# Tanh: 压缩到-1到1
-tanh = nn.Tanh()
-print(f"Tanh: {tanh(x)}")  # [-0.96, -0.76, 0, 0.76, 0.96]
-```
-
-**为什么ReLU最常用?**
-1. 计算简单(速度快)
-2. 不会梯度消失(训练效果好)
-3. 效果好(大多数情况)
-"""
+        "problem": "数据量太大，一张显卡装不下，或者算得太慢。",
+        "solution": "在一台电脑上插多张显卡，把数据切成小份，大家一起算。"
     },
-    
-    "nn.MaxPool2d": {
-        "what": "把图片缩小,保留最重要的信息",
-        "why": """
-### 🤔 为什么要用 MaxPool2d?
+    "230_多GPU训练实现": {
+        "title": "多GPU实战: 指挥乐队",
+        "analogy_title": "🎼 协调与同步",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你有4个鼓手（GPU），你想让他们打出整齐的节奏。
 
-**问题: 图片太大了**
-- 高清图片有几百万个像素
-- 计算量太大,速度慢
-- 内存不够用
+如果大家各打各的，声音就乱了（模型训练失败）。
+你需要一个**指挥家**（代码逻辑）：
+1. 告诉大家什么时候开始。
+2. 收集大家的声音。
+3. 确保大家节奏一致。
 
-**就像:**
-- ❌ 原图 = 看一本厚厚的书
-- ✅ 池化后 = 看这本书的摘要
-- 信息量减少,但重点保留
-
-**不用会怎样?**
-❌ 计算太慢
-❌ 内存不够
-❌ 容易过拟合(记住细节,忘记规律)
+**这就叫"同步" (Synchronization)。**
 """,
-        "example": """
-### 📱 实际应用: 图片识别
-
-**场景: 识别照片里是猫还是狗**
-
-```python
-import torch
-import torch.nn as nn
-
-# 假设这是一张猫的照片
-cat_image = torch.randn(1, 3, 224, 224)
-print(f"原始图片: {cat_image.shape}")  # [1, 3, 224, 224]
-
-# 第1步: 卷积找特征
-conv = nn.Conv2d(3, 64, kernel_size=3, padding=1)
-features = conv(cat_image)
-print(f"卷积后: {features.shape}")  # [1, 64, 224, 224]
-# 还是很大!
-
-# 第2步: 池化缩小
-pool = nn.MaxPool2d(kernel_size=2, stride=2)
-pooled = pool(features)
-print(f"池化后: {pooled.shape}")  # [1, 64, 112, 112]
-# 缩小一半!
-
-# 为什么有效?
-# 1. 图片缩小了: 224→112(减少75%的像素)
-# 2. 重要特征保留了: 取最大值=保留最强的特征
-# 3. 计算加速了: 像素少了,计算快了
-
-# 类比: 看图片缩略图
-# - 缩略图很小,但你还是能认出是猫
-# - MaxPool就是生成"特征缩略图"
-```
-
-**工作原理:**
-```python
-# 假设有一个2x2的特征区域
-feature_region = torch.tensor([
-    [1.0, 3.0],
-    [2.0, 4.0]
-])
-
-# MaxPool2d(2, 2)会取最大值
-# 结果: 4.0(保留最强的特征)
-
-# 为什么取最大值?
-# - 最大值 = 最强的特征响应
-# - 最强的特征 = 最重要的信息
-# - 例如: 检测到猫耳朵的强烈信号
-```
-""",
-        "progressive": """
-### 📚 循序渐进理解
-
-**第1层: 小学生理解**
-- 把图片变小
-- 保留重要信息
-
-**第2层: 初中生理解**
-- 用一个小窗口(如2x2)扫描图片
-- 每个窗口取最大值
-- 图片大小减半,但重要特征保留
-
-**第3层: 高中生理解**
-- MaxPool vs AvgPool:
-  * MaxPool: 取最大值(保留最强特征)
-  * AvgPool: 取平均值(保留整体信息)
-- 常用MaxPool,因为最强特征最重要
-
-**第4层: 参数详解**
-```python
-nn.MaxPool2d(
-    kernel_size=2,  # 窗口大小2x2
-    stride=2,       # 步长2(不重叠)
-    padding=0       # 不填充
-)
-
-# 输出大小计算:
-# output_size = (input_size - kernel_size) / stride + 1
-# 例如: (224 - 2) / 2 + 1 = 112
-```
-
-**第5层: 为什么有效?**
-1. **降维**: 减少计算量
-2. **不变性**: 特征位置稍微移动,结果不变
-3. **防止过拟合**: 减少参数,提高泛化能力
-"""
+        "problem": "多张显卡如果配合不好，反而会变慢或者出错。",
+        "solution": "使用专门的框架（如PyTorch DataParallel）来自动管理任务分配和结果汇总。"
     },
-    
-    "DataLoader": {
-        "what": "自动分批加载数据,像传送带一样",
-        "why": """
-### 🤔 为什么要用 DataLoader?
+    "231_分布式训练": {
+        "title": "分布式训练: 跨国公司合作",
+        "analogy_title": "🌍 远程协作",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+刚才是一个厨房里的4个大厨（单机多卡）。
+现在你要做满汉全席，需要100个大厨！一个厨房装不下。
 
-**问题: 数据太多,内存装不下**
-- 训练数据有几万张图片
-- 一次性加载会爆内存
-- 需要分批处理
+你必须把大厨分到 **10个不同的厨房 (多台机器)**。
+- **挑战**: 厨房之间离得很远，怎么沟通？
+- **解决**: 打电话、开视频会议（网络通信）。
 
-**就像:**
-- ❌ 一次性 = 一口气吃掉一整个蛋糕(撑死)
-- ✅ DataLoader = 一口一口吃(舒服)
-
-**不用会怎样?**
-❌ 内存不够,程序崩溃
-❌ 训练速度慢
-❌ 无法利用多核CPU
+**分布式训练** 就是让多台电脑通过网络连接，一起训练同一个模型。
 """,
-        "example": """
-### 📱 实际应用: 训练图片分类模型
+        "problem": "一台机器插满了显卡也不够用，模型太大了。",
+        "solution": "把多台机器连起来，通过网络传输数据，变成一个超级计算机集群。"
+    },
+    "232_数据增广": {
+        "title": "数据增广: 举一反三",
+        "analogy_title": "🐱 还是这只猫",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你教小朋友认"猫"。
+你只有一张猫的照片：猫正对着你。
 
-**场景: 训练一个识别猫狗的模型**
+如果考试时，猫是侧着的，或者是倒立的，小朋友可能就不认识了。
 
-```python
-import torch
-from torch.utils.data import Dataset, DataLoader
+**怎么办？**
+你不需要去拍新照片。你只需要把手里的照片：
+1. **旋转一下** (这就叫旋转)
+2. **调暗一点** (这就叫改变亮度)
+3. **剪裁一部分** (这就叫裁剪)
 
-# 假设我们有10000张猫狗图片
-class CatDogDataset(Dataset):
-    def __init__(self):
-        # 这里只是示例,实际会加载真实图片
-        self.images = torch.randn(10000, 3, 64, 64)  # 10000张图片
-        self.labels = torch.randint(0, 2, (10000,))  # 0=猫, 1=狗
-    
-    def __len__(self):
-        return len(self.images)
-    
-    def __getitem__(self, idx):
-        return self.images[idx], self.labels[idx]
-
-# 第1步: 创建数据集
-dataset = CatDogDataset()
-print(f"总共有 {len(dataset)} 张图片")
-
-# 第2步: 创建DataLoader(关键!)
-dataloader = DataLoader(
-    dataset,
-    batch_size=32,      # 每次取32张图片
-    shuffle=True,       # 打乱顺序(重要!)
-    num_workers=2       # 用2个进程加载数据(加速)
-)
-
-# 第3步: 训练(DataLoader自动分批)
-for epoch in range(3):  # 训练3轮
-    for batch_idx, (images, labels) in enumerate(dataloader):
-        # images: [32, 3, 64, 64] - 32张图片
-        # labels: [32] - 32个标签
-        
-        # 这里进行训练...
-        # model(images)
-        # ...
-        
-        if batch_idx == 0:  # 只打印第一批
-            print(f"Epoch {epoch+1}, Batch {batch_idx+1}")
-            print(f"  图片: {images.shape}")
-            print(f"  标签: {labels.shape}")
-
-# DataLoader的好处:
-# 1. 自动分批: 10000张图片分成313批(每批32张)
-# 2. 自动打乱: 每个epoch顺序不同(防止记住顺序)
-# 3. 并行加载: 一边训练一边加载下一批(不浪费时间)
-```
-
-**类比: 餐厅上菜**
-- 厨房 = Dataset(存储所有数据)
-- 服务员 = DataLoader(分批送菜)
-- batch_size = 每次端几盘菜
-- shuffle = 随机上菜顺序
-- num_workers = 几个服务员
+**这就叫数据增广！** 虽然只有一张图，但你变出了100种花样，让AI学得更扎实。
 """,
-        "progressive": """
-### 📚 循序渐进理解
+        "problem": "训练数据太少，AI容易死记硬背（过拟合）。",
+        "solution": "通过旋转、翻转、变色等方法，人为制造出更多数据，让AI学会各种情况下的识别。"
+    },
+    "233_微调": {
+        "title": "微调: 站在巨人的肩膀上",
+        "analogy_title": "🎓 大学生去送外卖",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你要招聘一个外卖员。
 
-**第1层: 小学生理解**
-- 数据太多,分批处理
-- 像传送带一样,一批一批送
+**选项 A (从头训练)**: 找个刚出生的婴儿，教他走路、认路、骑车... 20年后他才能送外卖。
+**选项 B (微调)**: 找个**大学毕业生**。他已经会走路、认字、骑车了（预训练）。你只需要教他"怎么使用外卖APP"（微调），他马上就能上岗。
 
-**第2层: 初中生理解**
-- Dataset: 存储所有数据
-- DataLoader: 从Dataset中取数据
-- batch_size: 每次取多少个
-- shuffle: 是否打乱顺序
+**预训练模型** 就是那个"大学毕业生"（已经学会在ImageNet上识别1000种物体）。
+**微调** 就是让他专门学习你的任务（比如识别某种特定的花）。
+""",
+        "problem": "从零开始训练一个厉害的AI，需要几百万张图片和几周时间。",
+        "solution": "下载别人训练好的模型（预训练），只针对自己的任务进行小规模的再训练（微调）。"
+    },
+    "234_实战Kaggle比赛图像分类CIFAR10": {
+        "title": "实战CIFAR10: 识图大赛初级班",
+        "analogy_title": "🖼️ 这是一个什么东西？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+这是一场针对小学生的识图比赛。
+卡片上画着：飞机、汽车、鸟、猫、鹿、狗、青蛙、马、船、卡车（共10类）。
 
-**第3层: 高中生理解**
-- 为什么要shuffle?
-  * 防止模型记住数据顺序
-  * 提高泛化能力
-  * 每个epoch看到的顺序不同
+**任务**: 给你一张模糊的小图片（32x32像素），你要马上喊出它是哪一类。
 
-- 为什么要batch?
-  * 一次处理多个样本,利用GPU并行
-  * 梯度更稳定(多个样本的平均)
-  * 内存可控(不会一次性加载所有数据)
+这就是 **CIFAR-10** 竞赛。它是深度学习界的"入门考试"。
+""",
+        "problem": "理论学了一堆，怎么用到真实的比赛中？",
+        "solution": "通过一个完整的流程：读取数据 -> 处理数据 -> 搭建模型 -> 训练 -> 提交结果，完成一次真正的AI竞赛。"
+    },
+    "235_实战Kaggle比赛狗的品种识别ImageNetDogs": {
+        "title": "实战狗狗分类: 专家级鉴赏",
+        "analogy_title": "🐕 它是哈士奇还是阿拉斯加？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+刚才的CIFAR-10只是分"猫"和"狗"。
+现在难度升级了！
 
-**第4层: 参数详解**
+全是狗！但你要分清楚：
+- 这是哈士奇
+- 这是阿拉斯加
+- 这是萨摩耶
+- ... 一共120种狗！
+
+这对人类来说都很难。你需要关注**细节**（耳朵的形状、毛色、尾巴）。
+这也是**微调**技术大显身手的地方。
+""",
+        "problem": "细粒度分类（Fine-grained Classification）很难，不同品种长得很像。",
+        "solution": "利用在大规模数据集上预训练好的模型（如ResNet），提取更丰富的细节特征。"
+    },
+    "236_物体检测和数据集": {
+        "title": "物体检测: 威利在哪里？",
+        "analogy_title": "🔍 不仅要说是啥，还要说是哪",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**图像分类**: 给你一张照片，问"这是什么？" -> "是一只猫"。
+**物体检测**: 给你一张照片，问"猫在哪里？"
+
+就像玩游戏 **《威利在哪里？》** (Where's Waldo?)。
+你需要用一个**红框**把目标圈出来。
+
+输出结果包含两部分：
+1. **类别**: 是猫。
+2. **位置**: (x, y, 宽, 高)。
+""",
+        "problem": "图片里可能有多个物体，而且位置不固定。",
+        "solution": "使用物体检测算法，同时预测物体的类别和边界框（Bounding Box）。"
+    },
+    "237_锚框": {
+        "title": "锚框: 饼干模具",
+        "analogy_title": "🍪 预设的形状",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你要在面团（图片）上切出饼干（物体）。
+物体有各种形状：有的瘦高（人），有的扁平（车），有的方正（盒子）。
+
+AI不知道怎么切。
+你给它一堆**模具 (锚框 Anchor Boxes)**：
+- 一个瘦高的模具
+- 一个扁平的模具
+- 一个方正的模具
+
+AI 只需要拿着模具在图上比划："这个地方用瘦高模具套一下，好像刚好套住了一个人！"
+""",
+        "problem": "物体形状千奇百怪，AI很难直接画出框。",
+        "solution": "先预设一组不同大小、不同长宽比的框（锚框），让AI去判断哪个框最接近真实物体。"
+    },
+    "238_树叶分类竞赛技术总结": {
+        "title": "树叶分类总结: 冠军的秘籍",
+        "analogy_title": "🍃 世界上没有两片相同的叶子",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+这是一场更难的比赛：给树叶分类。
+共有 176 种树叶！有些树叶长得几乎一模一样。
+
+**冠军是怎么赢的？**
+他们不仅用了最好的模型，还用了很多**技巧 (Tricks)**：
+- **测试时增强 (TTA)**: 考试时把卷子转过来看、倒过来看，多确认几次。
+- **模型融合 (Ensemble)**: 找5个学霸一起做题，投票决定答案。
+""",
+        "problem": "单一模型可能存在盲点，准确率到了瓶颈上不去。",
+        "solution": "综合使用各种高级技巧，榨干模型的每一个百分点的性能。"
+    },
+    "239_物体检测算法R-CNN、SSD、YOLO": {
+        "title": "R-CNN, SSD, YOLO: 找人战术大比拼",
+        "analogy_title": "⚡️ 速度与激情的较量",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+要在广场上找到通缉犯。
+
+**方法 1: R-CNN (精准但慢)**
+- 先把广场划分成2000个可能区域。
+- 每一个区域都仔细看一遍，拍照片，拿回去分析。
+- **结果**: 超级准，但找一个人要花好几秒。
+
+**方法 2: YOLO (You Only Look Once) (超快)**
+- 像人类一眼扫过广场。
+- 不需要切片，直接看全图，瞬间指出"那边有人！"
+- **结果**: 速度极快，可以实时监控，但偶尔会看走眼。
+
+**方法 3: SSD**
+- 结合了上面两者的优点，既快又准。
+""",
+        "problem": "要在准确率和速度之间做权衡。",
+        "solution": "根据应用场景选择算法。自动驾驶需要快(YOLO/SSD)，医疗诊断需要准(R-CNN)。"
+    },
+    "240_SSD实现": {
+        "title": "SSD实现: 多尺度侦察",
+        "analogy_title": "🔭 远近高低各不同",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你要侦察敌情。
+- 远处的坦克看起来很小（需要看大图的细节）。
+- 近处的士兵看起来很大（需要看局部的细节）。
+
+**SSD (Single Shot MultiBox Detector)** 的绝招是 **"多尺度检测"**：
+- 用**小特征图**看大物体（宏观）。
+- 用**大特征图**看小物体（微观）。
+
+就像你同时拿着望远镜和显微镜在找东西！
+""",
+        "problem": "同一张图里，物体有大有小，很难用一种方式全部检测出来。",
+        "solution": "在神经网络的不同层（不同分辨率）上同时进行检测。"
+    },
+    "241_语义分割和数据集": {
+        "title": "语义分割: 像素级填色游戏",
+        "analogy_title": "🎨 秘密花园涂色书",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**物体检测**: 画个框框住猫。
+**语义分割**: **要把猫的每一个毛孔都涂上颜色。**
+
+这就像小时候玩的填色游戏：
+- 看到天空，涂蓝色。
+- 看到草地，涂绿色。
+- 看到猫，涂黄色。
+
+每一个像素都要分类！
+""",
+        "problem": "矩形框太粗糙了，无法描述物体的精确轮廓（比如自动驾驶需要知道路沿的确切形状）。",
+        "solution": "对图像中的每一个像素进行分类，实现像素级的理解。"
+    },
+    "242_转置卷积": {
+        "title": "转置卷积: 图片放大术",
+        "analogy_title": "🔍 脑补细节",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**卷积**: 把大图变小（浓缩精华）。
+**转置卷积**: **把小图变大（脑补细节）。**
+
+就像你看到一张马赛克图片，你的大脑自动把它脑补成清晰的图片。
+转置卷积就是让AI学会"脑补"，把低分辨率的特征图还原成高分辨率的图片。
+""",
+        "problem": "语义分割需要输出和原图一样大的结果，但神经网络中间会把图片变小。",
+        "solution": "使用转置卷积（也叫反卷积）将特征图放大，恢复尺寸。"
+    },
+    "243_转置卷积是一种卷积": {
+        "title": "转置卷积原理: 逆向思维",
+        "analogy_title": "🔄 倒着推导",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+这节课有点数学，但别怕。
+
+如果是 **卷积 (压缩)**：
+- 3x3 的方块 -> 变成 1 个点。
+
+那么 **转置卷积 (放大)**：
+- 1 个点 -> 变成 3x3 的方块。
+
+它其实就是卷积运算的"逆过程"，就像把压缩饼干泡水还原一样。
+""",
+        "problem": "如何用数学矩阵运算来实现高效的图片放大？",
+        "solution": "通过填充零(padding)和特定的卷积核，实现尺寸的扩大。"
+    },
+    "244_全连接卷积神经网络FCN": {
+        "title": "FCN: 没有全连接层的网络",
+        "analogy_title": "🚀 全身都是卷积",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+传统的分类网络，最后都要经过一个"漏斗"（全连接层），把所有信息压缩成几个分类概率。
+这就像把图片压扁了。
+
+**FCN (Fully Convolutional Network)** 也就是 **全卷积网络**：
+- 它去掉了"漏斗"。
+- 它保留了空间信息。
+- 输入是图片，输出还是一张图片（热力图）。
+
+它是语义分割的开山鼻祖。
+""",
+        "problem": "全连接层会丢失空间信息，不适合做像素级分割。",
+        "solution": "把全连接层换成卷积层，配合转置卷积，实现端到端的图像分割。"
+    },
+    "245_样式迁移": {
+        "title": "样式迁移: AI大画家",
+        "analogy_title": "🖌️ 梵高画风的你",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你想让梵高为你画一幅肖像。
+但梵高不在了。
+
+AI可以模仿！
+- **内容**: 你的照片。
+- **风格**: 梵高的《星空》。
+
+**样式迁移**: 保持你的轮廓不变，但是把颜色和笔触换成梵高的风格。
+""",
+        "problem": "如何让计算机理解什么是'风格'？",
+        "solution": "定义两个损失函数：内容损失（像不像你）和风格损失（像不像梵高），让AI同时优化这两个目标。"
+    },
+    "246_序列模型": {
+        "title": "序列模型: 预测未来",
+        "analogy_title": "📈 股票与天气",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**静态数据**: 一张照片。昨天看是猫，今天看还是猫。
+**序列数据**: **股票价格、天气、说话的句子。**
+- 昨天的价格影响今天的价格。
+- 前一个词影响后一个词。
+
+**顺序很重要！** "狗咬人"和"人咬狗"意思完全不同。
+""",
+        "problem": "传统的神经网络假设数据之间没有关系，无法处理时间序列。",
+        "solution": "使用序列模型，专门考虑数据的前后关联。"
+    },
+    "247_文本预处理": {
+        "title": "文本预处理: 把书变成数字",
+        "analogy_title": "📖 字典查字",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+电脑看不懂中文，它只认识数字。
+我们要把《西游记》喂给电脑吃。
+
+1. **分词**: 把"孙悟空打妖怪"切成 ["孙悟空", "打", "妖怪"]。
+2. **建立字典**: 孙悟空=1, 打=2, 妖怪=3。
+3. **编码**: 变成 [1, 2, 3]。
+
+这就是**文本预处理**：把人类语言翻译成电脑能懂的数字代码。
+""",
+        "problem": "计算机无法直接计算文字。",
+        "solution": "通过分词、构建词表、数字化索引，将文本转换为向量。"
+    },
+    "248_语言模型": {
+        "title": "语言模型: 单词接龙",
+        "analogy_title": "🗣️ 下一个词是什么？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+我说："床前明月__"。
+你马上接："光"。
+
+为什么？因为你读过很多唐诗，你的大脑里有一个**语言模型**。
+它知道在"床前明月"后面，接"光"的概率最大，接"蛋糕"的概率很小。
+
+**语言模型**的任务就是：根据前面的词，预测下一个词。ChatGPT就是最强的语言模型。
+""",
+        "problem": "如何让机器学会像人一样通顺地说话？",
+        "solution": "统计词与词之间出现的概率（统计语言模型）或使用神经网络预测（神经语言模型）。"
+    },
+    "249_循环神经网络RNN": {
+        "title": "RNN: 只有7秒记忆的鱼？",
+        "analogy_title": "🧠 短期记忆",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你在读一个长句子。
+当你读到最后一个词时，你必须记得第一个词是什么，才能理解整句话。
+
+**普通神经网络**: 读一个词忘一个词（没记忆）。
+**RNN**: 脑子里有个小本子（隐藏状态 Hidden State）。
+- 读第一个词，记在本子上。
+- 读第二个词，参考本子上的内容，更新本子。
+
+但普通RNN记性不太好，像只有7秒记忆的鱼，句子太长就忘了开头。
+""",
+        "problem": "如何让神经网络处理变长的序列数据？",
+        "solution": "引入循环结构，将上一步的输出作为这一步的输入，传递状态信息。"
+    },
+    "250_循环神经网络RNN的实现": {
+        "title": "RNN实现: 手写记忆功能",
+        "analogy_title": "📝 代码里的笔记本",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+我们要用代码造一个"有记忆"的机器人。
+
+核心逻辑就是一个循环：
 ```python
-DataLoader(
-    dataset,              # 数据集
-    batch_size=32,        # 批量大小
-    shuffle=True,         # 是否打乱
-    num_workers=4,        # 加载数据的进程数
-    pin_memory=True,      # 加速GPU传输
-    drop_last=False       # 最后不足一批是否丢弃
-)
+memory = 0 # 初始记忆
+for word in sentence:
+    output, memory = process(word, memory)
 ```
+每处理一个词，不仅输出结果，还更新记忆。
+""",
+        "problem": "理解RNN内部的数据流动。",
+        "solution": "从零实现一个RNN单元，通过循环更新隐藏状态。"
+    },
+    "251_门控循环单元GRU": {
+        "title": "GRU: 聪明的笔记本",
+        "analogy_title": "🚪 记住重点，忘掉废话",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+RNN是个死脑筋，什么都记，结果记不住重点。
 
-**第5层: 性能优化**
-- num_workers=0: 单进程(慢,但调试方便)
-- num_workers=4: 4进程(快,但占用CPU)
-- pin_memory=True: 如果用GPU,设置True加速
-- persistent_workers=True: 进程不重启(更快)
-"""
+**GRU (Gated Recurrent Unit)** 是个聪明的笔记本。它有两个门：
+1. **重置门 (Reset Gate)**: "这句话是废话，忘了它吧。"
+2. **更新门 (Update Gate)**: "这句话是重点，一定要记住！"
+
+通过这两个门，GRU可以更有选择性地记忆，记得更久。
+""",
+        "problem": "普通RNN存在梯度消失问题，无法处理长序列。",
+        "solution": "引入门控机制，动态控制信息的保留和遗忘。"
+    },
+    "252_长短期记忆网络LSTM": {
+        "title": "LSTM: 超级记忆大师",
+        "analogy_title": "🧠 长期记忆 vs 短期记忆",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**LSTM (Long Short-Term Memory)** 比 GRU 更复杂，也更强大。
+它把记忆分成了：
+- **主线剧情 (Cell State)**: 贯穿整本书的核心记忆（比如主角的名字）。
+- **当前情节 (Hidden State)**: 当前这一章发生的细节。
+
+它有三个门：**遗忘门**、**输入门**、**输出门**。
+它能精准地控制：在这个时刻，该忘记什么，该记住什么，该输出什么。
+""",
+        "problem": "如何更精细地管理长期依赖和短期输入？",
+        "solution": "设计更复杂的门控结构，分离细胞状态(C)和隐藏状态(H)。"
+    },
+    "253_深层循环神经网络": {
+        "title": "深层RNN: 深度思考",
+        "analogy_title": "🏢 多层理解",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+- **浅层RNN**: 像读小说只看字面意思。
+- **深层RNN**:
+  - 第一层理解字面意思。
+  - 第二层理解情感色彩。
+  - 第三层理解哲学隐喻。
+
+通过叠加多层RNN，AI可以理解文本更深层次的含义。
+""",
+        "problem": "单层RNN的学习能力有限。",
+        "solution": "将多个RNN层堆叠起来，下一层的输出作为上一层的输入。"
+    },
+    "254_双向循环神经网络": {
+        "title": "双向RNN: 完形填空",
+        "analogy_title": "👀 前后文都要看",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+句子： "我今天__不舒服，所以没去上班。"
+
+如果你只看前面 "我今天..."，你猜不出填什么。
+如果你看后面 "...不舒服"，你就知道填 "身体"。
+
+**双向RNN (Bidirectional RNN)**:
+- 一个RNN从左往右读。
+- 另一个RNN从右往左读。
+- 最后把两边的理解拼起来。
+
+这对完形填空特别有用！
+""",
+        "problem": "有时候理解一个词，不仅需要上文，还需要下文。",
+        "solution": "使用两个方向相反的RNN，同时捕捉过去和未来的信息。"
+    },
+    "255_机器翻译数据集": {
+        "title": "机器翻译: 双语对照本",
+        "analogy_title": "🌍 罗塞塔石碑",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+我们要教AI翻译英语到法语。
+我们需要一本巨大的"双语对照书"：
+- Hello -> Bonjour
+- Cat -> Chat
+- ...
+
+数据处理很麻烦：
+- 英语句子长度不一样。
+- 法语句子长度也不一样。
+- 需要把它们对齐，短的要补空位（Padding），长的要截断。
+""",
+        "problem": "不同语言的词汇量、语法结构、句子长度都不同。",
+        "solution": "构建源语言和目标语言的词表，统一序列长度，制作成成对的数据集。"
+    },
+    "256_编码器解码器架构": {
+        "title": "Encoder-Decoder: 传声筒游戏",
+        "analogy_title": "🗣️ 思想的传递",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+**翻译的过程**：
+1. **编码器 (Encoder)**: 听一句英语 "I love you"，把它理解成一种**抽象的思想**（向量）。
+2. **解码器 (Decoder)**: 拿着这个抽象思想，用中文把它表达出来 "我爱你"。
+
+中间那个"抽象思想"（Context Vector），就是连接两种语言的桥梁。
+""",
+        "problem": "输入序列和输出序列的长度不一样（比如翻译），怎么对应？",
+        "solution": "将输入压缩成一个中间状态，再由输出端根据中间状态生成新的序列。"
+    },
+    "257_序列到序列学习seq2seq": {
+        "title": "Seq2Seq: 万能转换器",
+        "analogy_title": "🔄 任何序列转任何序列",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+Encoder-Decoder 架构不仅能做翻译，还能做很多事：
+- **对话机器人**: 输入"你好" -> 输出"很高兴见到你"。
+- **文章摘要**: 输入一篇文章 -> 输出一段简介。
+- **代码生成**: 输入中文需求 -> 输出Python代码。
+
+只要是 **序列 -> 序列** 的任务，它都能干！
+""",
+        "problem": "如何实现不定长输入到不定长输出的映射？",
+        "solution": "应用Encoder-Decoder架构进行端到端的训练。"
+    },
+    "258_束搜索": {
+        "title": "束搜索: 走一步看三步",
+        "analogy_title": "🔦 寻找最优解",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+翻译时，每个词都有很多种翻译法。
+- "I" -> "我" / "咱" / "俺"
+- "Love" -> "爱" / "喜欢"
+
+如果每次只选概率最大的那个词（贪心搜索），可能会捡了芝麻丢了西瓜。
+**束搜索 (Beam Search)**:
+- 每次保留概率最高的 **K** 种可能性（比如3种）。
+- 往后多看几步，看哪条路总分最高。
+
+就像下棋一样，不只看这一步，要往后推演几步。
+""",
+        "problem": "贪心搜索容易陷入局部最优，穷举搜索计算量太大。",
+        "solution": "折中方案：每一步保留k个最优候选路径。"
+    },
+    "259_注意力机制": {
+        "title": "注意力机制: 划重点",
+        "analogy_title": "👀 你的眼睛在看哪？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+你在翻译 "Tom is eating a red apple" 到中文。
+
+当你翻译 "苹果" 这个词时，你的眼睛应该盯着英文里的 **"apple"**，而不是盯着 "Tom"。
+
+**没有注意力机制**: 眉毛胡子一把抓，试图从整句话的模糊印象里翻译。
+**有注意力机制**: **指哪打哪**。翻译到哪个词，就聚焦到原句的对应部分。
+
+这是深度学习领域最伟大的发明之一！
+""",
+        "problem": "长句子翻译时，Encoder把所有信息压缩成一个向量，容易丢失细节。",
+        "solution": "Decoder在生成每个词时，都可以动态地查看Encoder的所有输出，并赋予不同的权重（注意力）。"
+    },
+    "260_注意力分数": {
+        "title": "注意力分数: 关系的亲疏",
+        "analogy_title": "❤️ 谁和谁更亲密？",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+在一个句子里，词和词之间的关系是不一样的。
+"我" 和 "爱" 关系紧密。
+"我" 和 "苹果" 关系疏远。
+
+**注意力分数 (Attention Score)** 就是计算这种**亲密度**的打分。
+- 分数高：说明两个词关系密切，要重点关注。
+- 分数低：说明关系不大，可以忽略。
+""",
+        "problem": "如何量化关注的程度？",
+        "solution": "通过数学公式（如点积、加性模型）计算Query和Key之间的相似度。"
+    },
+    "261_使用注意力机制的seq2seq": {
+        "title": "Seq2Seq + Attention: 顶配版翻译机",
+        "analogy_title": "🚀 性能起飞",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+这是 **Seq2Seq** 的究极进化版。
+- **Seq2Seq**: 像个死记硬背的学生，先把整句英文背下来，再默写中文。
+- **Seq2Seq + Attention**: 像个专业的同声传译，一边听，一边看，一边翻，随时调整注意力。
+
+效果就是：翻译长句子时，准确率大幅提升！
+""",
+        "problem": "将注意力机制集成到Seq2Seq模型中。",
+        "solution": "修改Decoder结构，让它在每一步解码时都计算上下文向量(Context Vector)。"
+    },
+    "262_自注意力": {
+        "title": "自注意力: 内部审视",
+        "analogy_title": "🧘‍♂️ 句子内部的连接",
+        "analogy_content": """
+### 🧪 想象这样一个场景
+句子："这个**苹果**真好吃，因为它很**甜**。"
+这里面的 "它" 指的是谁？是 "苹果"。
+
+人类一眼就能看出 "它" = "苹果"。
+**自注意力 (Self-Attention)** 就是让计算机学会这种能力：
+- 计算句子**自身**各个词之间的关联。
+- 发现 "它" 和 "苹果" 关联度很高。
+
+它是后来大名鼎鼎的 **Transformer** 模型的核心基石！
+""",
+        "problem": "RNN处理长距离依赖还是很吃力，且无法并行计算。",
+        "solution": "抛弃循环结构，直接计算句子中所有词两两之间的关系。"
     }
 }
 
-def add_function_explanation(notebook_path):
-    """为笔记本中的函数添加详细讲解"""
+# Standard template for High School Friendly intro
+TEMPLATE = """
+# {title}
+
+**分类:** {category}
+
+**{analogy_title}**
+
+---
+
+{analogy_content}
+
+### 🎯 为什么需要这个技术?
+
+**问题:** {problem}
+
+**解决:** {solution}
+
+### 📚 循序渐进学习
+
+**第一步: 理解问题** (你现在在这里)
+- 为什么需要这个技术?
+- 它解决什么问题?
+
+**第二步: 学习原理** (接下来)
+- 这个技术如何工作?
+- 核心思想是什么?
+
+**第三步: 实际应用** (最后)
+- 如何应用到实际项目?
+- 如何解决实际问题?
+"""
+
+def optimize_notebook(file_path):
+    print(f"Processing {file_path}...")
     try:
-        with open(notebook_path, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             notebook = json.load(f)
-        
-        if not notebook.get('cells'):
-            return False
-        
-        filename = os.path.basename(notebook_path)
-        modified = False
-        
-        # 遍历所有代码单元
-        for i, cell in enumerate(notebook['cells']):
-            if cell['cell_type'] != 'code':
-                continue
-            
-            code = ''.join(cell.get('source', []))
-            
-            # 检查代码中是否包含我们要讲解的函数
-            for func_name, explanation in FUNCTION_EXPLANATIONS.items():
-                if func_name in code:
-                    # 检查前一个cell是否已经有讲解
-                    if i > 0 and notebook['cells'][i-1]['cell_type'] == 'markdown':
-                        prev_content = ''.join(notebook['cells'][i-1]['source'])
-                        if '🤔 为什么要用' in prev_content:
-                            continue  # 已经添加过
-                    
-                    # 创建讲解cell
-                    explanation_cell = {
-                        "cell_type": "markdown",
-                        "metadata": {},
-                        "source": [
-                            f"\n## 🔍 深入理解: {func_name}\n\n",
-                            f"**{explanation['what']}**\n\n",
-                            explanation['why'] + "\n\n",
-                            explanation['example'] + "\n\n",
-                            explanation['progressive'] + "\n"
-                        ]
-                    }
-                    
-                    # 插入到代码cell之前
-                    notebook['cells'].insert(i, explanation_cell)
-                    modified = True
-                    print(f"  ✓ {filename} - 添加 {func_name} 讲解")
-                    break  # 每次只处理一个函数,避免索引混乱
-        
-        if modified:
-            with open(notebook_path, 'w', encoding='utf-8') as f:
-                json.dump(notebook, f, ensure_ascii=False, indent=1)
-            return True
-        
-        return False
-        
     except Exception as e:
-        print(f"  ✗ {filename} - 失败: {e}")
-        return False
+        print(f"Error reading {file_path}: {e}")
+        return
+
+    # Extract filename without extension to match key
+    filename = os.path.basename(file_path).replace('.ipynb', '')
+    
+    # Find matching config
+    config = None
+    for key in CONCEPT_MAP:
+        if key in filename:
+            config = CONCEPT_MAP[key]
+            break
+            
+    if not config:
+        print(f"No specific config found for {filename}, skipping detailed header replace.")
+        return
+
+    # Determine category based on filename
+    category = "高级主题"
+    if "实战" in filename or "实现" in filename:
+        category = "实战应用"
+    elif "循环" in filename or "序列" in filename or "语言" in filename:
+        category = "自然语言处理 (NLP)"
+    elif "物体检测" in filename or "分割" in filename or "卷积" in filename:
+        category = "计算机视觉 (CV)"
+
+    # Create the new header content
+    new_header_source = TEMPLATE.format(
+        title=filename.split('_', 1)[1] if '_' in filename else filename, # Remove number prefix
+        category=category,
+        analogy_title=config['analogy_title'],
+        analogy_content=config['analogy_content'].strip(),
+        problem=config['problem'],
+        solution=config['solution']
+    )
+    
+    # Split into lines for JSON format
+    new_header_lines = [line + '\n' for line in new_header_source.split('\n')]
+    # Remove last newline to be clean
+    if new_header_lines and new_header_lines[-1] == '\n':
+        new_header_lines.pop()
+
+    # 1. Update or Insert the Main Header (First Cell)
+    # Check if first cell is markdown and looks like a header
+    if notebook['cells'] and notebook['cells'][0]['cell_type'] == 'markdown':
+        # Replace the first cell content
+        notebook['cells'][0]['source'] = new_header_lines
+    else:
+        # Insert at beginning
+        notebook['cells'].insert(0, {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": new_header_lines
+        })
+
+    # 2. Ensure "Beginner Tips" (新手必看) exists
+    # Check if second cell is "Beginner Tips". If not, insert it.
+    # We define a standard Beginner Tips cell
+    beginner_tips_source = [
+        "\n",
+        "## 🔰 新手必看\n",
+        "\n",
+        "**第一次学？这些提示能帮到你！**\n",
+        "\n",
+        "### 💡 学习建议\n",
+        "\n",
+        "1. **不要急** - 慢慢看，不懂的多看几遍\n",
+        "2. **动手做** - 每个代码都运行一遍\n",
+        "3. **改参数** - 试着改改数字，看看会怎样\n",
+        "4. **记笔记** - 把重点记下来\n",
+        "\n",
+        "### ⚠️ 常见问题\n",
+        "\n",
+        "**Q: 代码报错怎么办？**\n",
+        "- 先看错误提示（红色的那行）\n",
+        "- 检查是否有拼写错误\n",
+        "- 确认缩进是否正确（Python对空格很敏感）\n",
+        "- 复制错误信息搜索一下\n",
+        "\n",
+        "**Q: 看不懂怎么办？**\n",
+        "- 跳过难的部分，先学简单的\n",
+        "- 看看前面的课程有没有遗漏\n",
+        "- 多看几遍，理解需要时间\n",
+        "\n",
+        "**Q: 需要什么基础？**\n",
+        "- 会用电脑就行\n",
+        "- Python基础最好有，没有也能学\n",
+        "- 数学不好也没关系，我们用例子讲\n",
+        "\n",
+        "### 📌 学习技巧\n",
+        "\n",
+        "- 🎯 **目标明确**: 知道这节课要学什么\n",
+        "- 📝 **做笔记**: 重点内容记下来\n",
+        "- 💻 **多练习**: 代码要自己敲一遍\n",
+        "- 🤔 **多思考**: 想想为什么这样做\n",
+        "- 🔄 **多复习**: 学完了回头再看看\n",
+        "\n",
+        "---\n",
+        "\n"
+    ]
+
+    # Check existence
+    has_tips = False
+    if len(notebook['cells']) > 1:
+        source_text = "".join(notebook['cells'][1]['source'])
+        if "新手必看" in source_text:
+            has_tips = True
+    
+    if not has_tips:
+        notebook['cells'].insert(1, {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": beginner_tips_source
+        })
+
+    # Save back
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(notebook, f, indent=1, ensure_ascii=False)
+    print(f"✅ Optimized {filename}")
 
 def main():
-    notebooks_dir = Path('/Users/h/practice/CV-main')
-    
-    print("🚀 深度优化: 添加函数实际应用讲解...\n")
-    print("📝 本次优化:")
-    print("   - 为每个函数添加'为什么要用'")
-    print("   - 添加实际应用场景")
-    print("   - 添加生活类比")
-    print("   - 循序渐进展开知识点")
-    print("   - 确保初中生都能看懂\n")
-    
-    success_count = 0
-    total_count = 0
-    
-    for file in sorted(os.listdir(notebooks_dir)):
-        if file.endswith('.ipynb') and not file.endswith('_backup.ipynb'):
-            total_count += 1
-            nb_path = notebooks_dir / file
-            if add_function_explanation(nb_path):
-                success_count += 1
-    
-    print(f"\n{'='*60}")
-    print(f"✅ 完成! 成功优化 {success_count} 个笔记本")
-    print(f"{'='*60}")
-    
-    print("\n🎉 现在每个函数都有:")
-    print("   ✓ 为什么要用(不用会怎样)")
-    print("   ✓ 实际应用场景(真实例子)")
-    print("   ✓ 生活类比(容易理解)")
-    print("   ✓ 循序渐进讲解(从简单到复杂)")
-    print("   ✓ 初中生都能看懂!")
+    base_dir = Path("/Users/h/practice/CV-main")
+    # Specific list from user
+    target_files = [
+        "227_深度学习硬件CPU和GPU.ipynb",
+        "228_深度学习硬件TPU和其他.ipynb",
+        "229_单机多卡并行.ipynb",
+        "230_多GPU训练实现.ipynb",
+        "231_分布式训练.ipynb",
+        "232_数据增广.ipynb",
+        "233_微调.ipynb",
+        "234_实战Kaggle比赛图像分类CIFAR10.ipynb",
+        "235_实战Kaggle比赛狗的品种识别ImageNetDogs.ipynb",
+        "236_物体检测和数据集.ipynb",
+        "237_锚框.ipynb",
+        "238_树叶分类竞赛技术总结.ipynb",
+        "239_物体检测算法R-CNN、SSD、YOLO.ipynb",
+        "240_SSD实现.ipynb",
+        "241_语义分割和数据集.ipynb",
+        "242_转置卷积.ipynb",
+        "243_转置卷积是一种卷积.ipynb",
+        "244_全连接卷积神经网络FCN.ipynb",
+        "245_样式迁移.ipynb",
+        "246_序列模型.ipynb",
+        "247_文本预处理.ipynb",
+        "248_语言模型.ipynb",
+        "249_循环神经网络RNN.ipynb",
+        "250_循环神经网络RNN的实现.ipynb",
+        "251_门控循环单元GRU.ipynb",
+        "252_长短期记忆网络LSTM.ipynb",
+        "253_深层循环神经网络.ipynb",
+        "254_双向循环神经网络.ipynb",
+        "255_机器翻译数据集.ipynb",
+        "256_编码器解码器架构.ipynb",
+        "257_序列到序列学习seq2seq.ipynb",
+        "258_束搜索.ipynb",
+        "259_注意力机制.ipynb",
+        "260_注意力分数.ipynb",
+        "261_使用注意力机制的seq2seq.ipynb",
+        "262_自注意力.ipynb"
+    ]
+
+    for filename in target_files:
+        file_path = base_dir / filename
+        if file_path.exists():
+            optimize_notebook(str(file_path))
+        else:
+            print(f"⚠️ File not found: {filename}")
 
 if __name__ == "__main__":
     main()
