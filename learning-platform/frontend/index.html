@@ -36,7 +36,7 @@
         <!-- 左侧边栏:课程列表 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2><i class="ri-book-read-line"></i> 课程菜单</h2>
+                <h2><i class="ri-book-read-line"></i> 课程菜单 <span style="font-size: 0.8em; color: var(--text-light); font-weight: normal;">(<span id="totalNotebooks">0</span>)</span></h2>
                 <button id="collapseAllBtn" title="折叠所有分类"><i class="ri-expand-height-line"></i> 折叠</button>
             </div>
             <div id="categoriesList" class="categories-list">
@@ -97,6 +97,15 @@
                         <p>Made with ❤️ for Future AI Engineers</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- 搜索结果页 -->
+            <div id="searchResults" class="search-results" style="display: none;">
+                <div class="search-header">
+                    <button id="closeSearchBtn" class="back-btn"><i class="ri-close-line"></i> 关闭搜索</button>
+                    <h2><i class="ri-search-line"></i> 搜索结果</h2>
+                </div>
+                <div id="searchResultsList" class="search-results-list"></div>
             </div>
 
             <!-- 笔记本查看器 -->

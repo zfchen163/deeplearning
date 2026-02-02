@@ -64,7 +64,7 @@ function renderCategories(categories) {
             </div>
             <div class="notebooks-list" id="notebooks-${category.name}" style="display: none;">
                 ${category.notebooks.map(notebook => `
-                    <div class="notebook-item" onclick="loadNotebook('${notebook.filename}', '${notebook.title}', '${category.name}')">
+                    <div class="notebook-item" onclick="loadNotebook('${notebook.filename}', '${notebook.title}', '${category.name}', this)">
                         <span class="notebook-order">${notebook.order}.</span>
                         <span class="notebook-title">${notebook.title}</span>
                     </div>
@@ -110,7 +110,7 @@ function toggleAllCategories() {
 }
 
 // 加载笔记本内容
-async function loadNotebook(filename, title, category) {
+async function loadNotebook(filename, title, category, element) {
     try {
         // 显示加载状态
         showNotebookViewer();
@@ -119,10 +119,17 @@ async function loadNotebook(filename, title, category) {
         document.getElementById('notebookContent').innerHTML = '<div class="loading">加载中</div>';
 
         // 高亮当前笔记本
-        document.querySelectorAll('.notebook-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        event.currentTarget.classList.add('active');
+        if (element) {
+            document.querySelectorAll('.notebook-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        } else if (event && event.currentTarget) {
+             document.querySelectorAll('.notebook-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
 
         // 获取笔记本内容
         const response = await fetch(`${API_BASE}/notebook/${filename}`);
